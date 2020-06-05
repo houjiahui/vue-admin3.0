@@ -36,14 +36,12 @@
     </div>
 </template>
 <script>
-import { reactive, ref, onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePassword,validateSendCode } from '@/utils/validate'; 
 export default {
     name: 'login',
-    // setup(props,context) {
-    setup(props,{ refs }) {
+    data() {
         // 验证邮箱
-        let validateUsername = (rule, value, callback) => {
+        var validateUsername = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('请输入用户名'));
             } else if(validateEmail(value)){
@@ -53,12 +51,12 @@ export default {
             }
         };
         // 验证密码
-        let validatePwd = (rule, value, callback) => {
-            ruleForm.password = stripscript(value);
-            value=ruleForm.password;
+        var validatePwd = (rule, value, callback) => {
+            this.ruleForm.password = stripscript(value);
+            value=this.ruleForm.password;
             // console.log(stripscript(value));
             if (value === '') {
-                callback(new Error('请输入密码'));
+                callback(new Error('请再次输入密码'));
             } else if (validatePassword(value)) {
                 callback(new Error('密码为6-20位的数字+字母'));
             } else {
@@ -66,22 +64,22 @@ export default {
             }
         };
         // 验证重复密码
-        let validatePwds = (rule, value, callback) => {
-            if(model.value === 'login'){ callback(); }
-            ruleForm.passwords = stripscript(value);
-            value=ruleForm.passwords;
+        var validatePwds = (rule, value, callback) => {
+            if(this.model === 'login'){ callback(); }
+            this.ruleForm.passwords = stripscript(value);
+            value=this.ruleForm.passwords;
             if (value === '') {
                 callback(new Error('请再次输入密码'));
-            } else if (value != ruleForm.password ) {
+            } else if (value != this.ruleForm.password ) {
                 callback(new Error('两次输入密码不同'));
             } else {
                 callback();
             }
         }
         // 验证码
-        let validateCode = (rule, value, callback) => {
-            ruleForm.code = stripscript(value);
-            value=ruleForm.code;
+        var validateCode = (rule, value, callback) => {
+            this.ruleForm.code = stripscript(value);
+            value=this.ruleForm.code;
             let reg=/^([a-z0-9]{6})$/;
             if (value === '') {
                 return callback(new Error('请输入验证码'));
@@ -91,67 +89,54 @@ export default {
                 callback();
             }
         };
-        // 声明变量，数据
-        const menuTab = reactive([
-            {txt:'登录',current:true,type:'login'},
-            {txt:'注册',current:false,type:'register'}
-        ])
-        // 模块值
-        const model = ref('login')
-        // 表单绑定数据
-        const ruleForm = reactive({
-            username: '',
-            password: '',
-            passwords: '',
-            code: ''
-        })
-        // 表单的验证
-        const rules = reactive({
-            username: [
-                { validator: validateUsername, trigger: 'blur' }
+        return {
+            model:'login',
+            menuTab:[
+                {txt:'登录',current:true,type:'login'},
+                {txt:'注册',current:false,type:'register'}
             ],
-            password: [
-                { validator: validatePwd, trigger: 'blur' }
-            ],
-            passwords: [
-                { validator: validatePwds, trigger: 'blur' }
-            ],
-            code: [
-                { validator: validateCode, trigger: 'blur' }
-            ]
-        }) 
-        // 声明函数
-        const toggleMenu=(data =>{
-            menuTab.forEach(elem =>{
+            isActive: true,
+            ruleForm: {
+                username: '',
+                password: '',
+                passwords: '',
+                code: ''
+            },
+            rules: {
+                username: [
+                    { validator: validateUsername, trigger: 'blur' }
+                ],
+                password: [
+                    { validator: validatePwd, trigger: 'blur' }
+                ],
+                passwords: [
+                    { validator: validatePwds, trigger: 'blur' }
+                ],
+                code: [
+                    { validator: validateCode, trigger: 'blur' }
+                ]
+            }
+        }
+    },
+    methods: {
+        toggleMenu(data){
+            this.menuTab.forEach(elem =>{
                 elem.current=false
             })
             data.current=true;
-            model.value=data.type;
-        })
-        const submitForm = (formName => {
-            // context.refs[formName].validate((valid) => {
-            refs[formName].validate((valid) => {
-                if (valid) {
-                    alert('submit!');
-                } else {
-                    console.log('error submit!!');
-                    return false;
-                }
+            this.model=data.type;
+        },
+        submitForm(formName) {
+            this.$refs[formName].validate((valid) => {
+            if (valid) {
+                alert('submit!');
+            } else {
+                console.log('error submit!!');
+                return false;
+            }
             });
-        })
-        // 生命周期
-        onMounted(() => {
-
-        })
-        return {
-            menuTab,
-            model,
-            rules,
-            ruleForm,
-            toggleMenu,
-            submitForm,
         }
-    }
+    },
 }
 </script>
  <style lang="scss" scoped>
