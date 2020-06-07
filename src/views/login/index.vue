@@ -6,42 +6,51 @@
             </ul>
             <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" class="login-form" size="medium">
                 <el-form-item prop="username" class="item-form">
-                    <label>邮箱</label>
-                    <el-input type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
+                    <label for="usename">邮箱</label>
+                    <el-input id="usename" type="text" v-model="ruleForm.username" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="password" class="item-form">
-                    <label>密码</label>
-                    <el-input type="password" v-model="ruleForm.password" minlength="6" maxlength="20" autocomplete="off"></el-input>
+                    <label for="pwd1">密码</label>
+                    <el-input id="pwd1" type="password" v-model="ruleForm.password" minlength="6" maxlength="20" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="passwords" class="item-form" v-show="model === 'register'">
-                    <label>重复密码</label>
-                    <el-input type="password" v-model="ruleForm.passwords" minlength="6" maxlength="20" autocomplete="off"></el-input>
+                    <label for="pwd2">重复密码</label>
+                    <el-input id="pwd2" type="password" v-model="ruleForm.passwords" minlength="6" maxlength="20" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item prop="code" class="item-form">
                     <label>验证码</label>
                     <el-row :gutter="10">
                         <el-col :span="15">
-                            <el-input v-model.number="ruleForm.code" minlength="6" maxlength="6"></el-input>
+                            <el-input v-model="ruleForm.code" minlength="6" maxlength="6"></el-input>
                         </el-col>
                         <el-col :span="9">
-                            <el-button class="block" type="primary">获取验证码</el-button>
+                            <el-button class="block" type="primary" @click="getSms()" :disabled="codebuttonstatus.status">{{ codebuttonstatus.text }}</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
                 <el-form-item>
-                    <el-button class="margin-top-19 login-btn block" type="danger" @click="submitForm('ruleForm')">提交</el-button>
+                    <el-button class="margin-top-19 login-btn block" type="danger" @click="submitForm('ruleForm')" :disabled="loginButton">{{ model === 'login' ? "登录" : "注册" }}</el-button>
                 </el-form-item>
             </el-form>
         </div>
     </div>
 </template>
 <script>
+import { GetSms, Register, Login } from '@/api/login'
 import { reactive, ref, onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePassword,validateSendCode } from '@/utils/validate'; 
 export default {
     name: 'login',
     // setup(props,context) {
-    setup(props,{ refs }) {
+        // attrs: (...) == this.attrs 
+        // emit: (...)  == this.emit
+        // isServer: (...)  == this.isServer
+        // listeners: (...)  == this.listeners
+        // parent: (...)  == this.parent
+        // refs: (...)    == this.refs
+        // root: (...)    == this.root
+        // slots: {}      == this.slots
+    setup(props,{ refs,root }) {
         // 验证邮箱
         let validateUsername = (rule, value, callback) => {
             if (value === '') {
@@ -98,6 +107,12 @@ export default {
         ])
         // 模块值
         const model = ref('login')
+        const loginButton = ref(true);
+        const codebuttonstatus =reactive({
+            status: false,
+            text: '获取验证码'
+        })
+        const timer =ref(null);
         // 表单绑定数据
         const ruleForm = reactive({
             username: '',
@@ -127,29 +142,135 @@ export default {
             })
             data.current=true;
             model.value=data.type;
+            resetFromData();
+            clearCountDown();
         })
+        // 清除表单数据
+        const resetFromData = (() => {
+            // 重置表单
+            // this.$refs[ruleForm].resetFields(); //2.0
+            refs.ruleForm.resetFields();  // 3.0
+        })
+        // 获取验证码
+        const getSms = (()=>{
+            if(ruleForm.username == ''){
+                root.$message.error('邮箱不能为空');
+                return false;
+            }
+            if(validateEmail(ruleForm.username)){
+                root.$message.error('请输入格式正确的用户名');
+                return false;
+            }
+            // 请求提交
+            let data= {
+                username: ruleForm.username,
+                module: model.value
+            }
+            // 请求延时
+            codebuttonstatus.status=true;
+            codebuttonstatus.text='发送中';
+            GetSms(data).then(response => {
+                let data= response.data;
+                root.$message({
+                    message: data.message,
+                    type: 'success'
+                });
+                loginButton.value = false;
+                countDown(60);
+            }).catch(error => {
+
+            })
+        })
+        // 提交表单
         const submitForm = (formName => {
             // context.refs[formName].validate((valid) => {
             refs[formName].validate((valid) => {
                 if (valid) {
-                    alert('submit!');
+                   model.value === 'login' ? login() : register() 
                 } else {
                     console.log('error submit!!');
                     return false;
                 }
             });
         })
+        // 登录
+        const login = (() => {
+            let requestData={
+                usename: ruleForm.username,
+                password: ruleForm.password,
+                code: ruleForm.code
+            }
+            // 注册接口
+            Login(requestData).then(response =>{
+                let data= response.data;
+                root.$message({
+                    message: data.message,
+                    type: 'success'
+                });
+            }).catch(error => {
+
+            })
+        })
+        // 注册
+        const register = (() => {
+            let requestData = {
+                usename: ruleForm.username,
+                password: ruleForm.password,
+                code: ruleForm.code,
+                module: 'register'
+            }
+            // 注册接口
+            Register(requestData).then(response =>{
+                consoel.log(1111);
+                let data= response.data;
+                root.$message({
+                    message: data.message,
+                    type: 'success'
+                });
+                toggleMenu(menuTab[0]);
+                clearCountDown();
+            }).catch(error => {
+
+            })
+        })
+        // 倒计时
+        const countDown =((num)=>{
+            // 判断定时器是否存在  存在就清除
+            if(timer.value){clearInterval(timer.value);}
+            let number = num;
+            timer.value = setInterval (()=>{
+                number--;
+                if(number === 0){
+                    clearInterval(timer.value);
+                    codebuttonstatus.status=false;
+                    codebuttonstatus.text='再次发送';
+                }else{
+                    codebuttonstatus.text=`倒计时${number}秒`;
+                }
+            },1000)
+        })
+        // 清除倒计时
+        const clearCountDown =(() => {
+            // 按钮恢复默认状态
+            codebuttonstatus.status=false;
+            codebuttonstatus.text='获取验证码';
+            clearInterval(timer.value);
+        })
         // 生命周期
         onMounted(() => {
-
+            
         })
         return {
             menuTab,
             model,
+            loginButton,
+            codebuttonstatus,
+            timer,
             rules,
             ruleForm,
             toggleMenu,
             submitForm,
+            getSms,
         }
     }
 }
