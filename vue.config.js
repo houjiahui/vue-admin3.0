@@ -16,6 +16,16 @@ module.exports = {
     parallel: require("os").cpus().length > 1, // 是否为 Babel 或 TypeScript 使用 thread-loader。该选项在系统的 CPU 有多于一个内核时自动启用，仅作用于生产构建。
     pwa: {}, // 向 PWA 插件传递选项。
     chainWebpack: config => {
+        const svgRule = config.module.rule('svg');
+        svgRule.uses.clear();
+        // 添加要替换的 loader
+        svgRule
+        .use('svg-sprite-loader')
+        .loader('svg-sprite-loader')
+        .options({
+            symbolId: 'icon-[name]',
+            include: ["./src/icons"]
+        });
         config.resolve.symlinks(true); // 修复热更新失效
         // 如果使用多页面打包，使用vue inspect --plugins查看html是否在结果数组中
         config.plugin("html").tap(args => {
@@ -52,6 +62,14 @@ module.exports = {
         }
     },
     configureWebpack: config => {
+        config.resolve = { // 配置解析别名
+            extensions: ['.js', '.json', '.vue'],  // 自动添加文件名后缀
+            alias: {
+                'vue': 'vue/dist/vue.js',
+                '@': path.resolve(__dirname, './src'),
+                '@c': path.resolve(__dirname, './src/components')
+            }
+        };
         // 开启 gzip 压缩
         // 需要 npm i -D compression-webpack-plugin
         const plugins = [];

@@ -36,11 +36,12 @@
     </div>
 </template>
 <script>
+import sha1 from 'js-sha1'
 import { GetSms, Register, Login } from '@/api/login'
 import { reactive, ref, onMounted } from '@vue/composition-api'
 import { stripscript,validateEmail,validatePassword,validateSendCode } from '@/utils/validate'; 
 export default {
-    name: 'login',
+    name: 'Login',
     // setup(props,context) {
         // attrs: (...) == this.attrs 
         // emit: (...)  == this.emit
@@ -107,6 +108,7 @@ export default {
         ])
         // 模块值
         const model = ref('login')
+        // 登录按钮修改
         const loginButton = ref(true);
         const codebuttonstatus =reactive({
             status: false,
@@ -151,6 +153,10 @@ export default {
             // this.$refs[ruleForm].resetFields(); //2.0
             refs.ruleForm.resetFields();  // 3.0
         })
+        const updateButtonStatus =((params) => {
+            codebuttonstatus.status=params.status;
+            codebuttonstatus.text=params.text;
+        })
         // 获取验证码
         const getSms = (()=>{
             if(ruleForm.username == ''){
@@ -167,8 +173,10 @@ export default {
                 module: model.value
             }
             // 请求延时
-            codebuttonstatus.status=true;
-            codebuttonstatus.text='发送中';
+            updateButtonStatus({
+                status: true,
+                text: '发送中'
+            })
             GetSms(data).then(response => {
                 let data= response.data;
                 root.$message({
@@ -183,6 +191,10 @@ export default {
         })
         // 提交表单
         const submitForm = (formName => {
+            // root.$router.push({
+            //     name:'Console'
+            // })
+            // return false;
             // context.refs[formName].validate((valid) => {
             refs[formName].validate((valid) => {
                 if (valid) {
@@ -197,16 +209,19 @@ export default {
         const login = (() => {
             let requestData={
                 usename: ruleForm.username,
-                password: ruleForm.password,
+                password: sha1(ruleForm.password),
                 code: ruleForm.code
             }
-            // 注册接口
+            // 登录接口
             Login(requestData).then(response =>{
                 let data= response.data;
                 root.$message({
                     message: data.message,
                     type: 'success'
                 });
+                root.$router.push({
+                    name:'Console'
+                })
             }).catch(error => {
 
             })
@@ -215,7 +230,7 @@ export default {
         const register = (() => {
             let requestData = {
                 usename: ruleForm.username,
-                password: ruleForm.password,
+                password: sha1(ruleForm.password),
                 code: ruleForm.code,
                 module: 'register'
             }
@@ -242,8 +257,10 @@ export default {
                 number--;
                 if(number === 0){
                     clearInterval(timer.value);
-                    codebuttonstatus.status=false;
-                    codebuttonstatus.text='再次发送';
+                    updateButtonStatus({
+                        status: false,
+                        text: '再次发送'
+                    })
                 }else{
                     codebuttonstatus.text=`倒计时${number}秒`;
                 }
@@ -252,8 +269,10 @@ export default {
         // 清除倒计时
         const clearCountDown =(() => {
             // 按钮恢复默认状态
-            codebuttonstatus.status=false;
-            codebuttonstatus.text='获取验证码';
+            updateButtonStatus({
+                status: false,
+                text: '获取验证码'
+            })
             clearInterval(timer.value);
         })
         // 生命周期
