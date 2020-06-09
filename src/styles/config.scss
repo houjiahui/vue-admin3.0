@@ -2,7 +2,16 @@ $color:#fff;
 // 后台框架尺寸
 // 菜单宽度
 $navMenu:250px;
+$navMenuMix:64px;
 $navBgc:#344a5f;
 $layoutHeader:75px;
 // 主颜色
 $mainCcolor: #f56c6c;
+// 动画过渡
+@mixin webkit($type, $value) {
+    -webkit-#{$type}: $value ;
+    -o-#{$type}: $value ;
+    -moz-#{$type}: $value ;
+    -ms-#{$type}: $value ;
+    #{$type}: $value ;
+}

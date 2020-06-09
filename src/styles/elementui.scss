@@ -4,10 +4,10 @@
     &.is-active { background-color: rgba(245, 108, 108, 0.2) !important; }
 }
 li.el-submenu{
-    &.is-active{
-        &.is-opened .el-submenu__title{
-            background-color: $mainCcolor !important;
-        }
-        
+    &.is-active .el-submenu__title{
+        background-color: $mainCcolor !important;
     }
+}
+.el-menu{
+    border: none !important;
 }

@@ -24,7 +24,7 @@ module.exports = {
         .loader('svg-sprite-loader')
         .options({
             symbolId: 'icon-[name]',
-            include: ["./src/icons"]
+            include: ["./src/Icon"]
         });
         config.resolve.symlinks(true); // 修复热更新失效
         // 如果使用多页面打包，使用vue inspect --plugins查看html是否在结果数组中

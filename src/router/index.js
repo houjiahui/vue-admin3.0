@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
 
+import Layout from '@/views/Layout'
 const routes = [
   {
     path: "/",
@@ -29,11 +30,11 @@ const routes = [
       name:'控制台',
       icon:'console'
     },
-    component: () => import( "../views/Layout/index.vue"),
+    component: Layout,
     children: [
       {
         path: "/index",
-        name: "index",
+        name: "Index",
         meta:{
           name:'首页'
         },
@@ -48,11 +49,11 @@ const routes = [
       name:'信息管理',
       icon:'info'
     },
-    component: () => import( "../views/Layout/index.vue"),
+    component:Layout,
     children: [
       {
         path: "/indexInfo",
-        name: "indexInfo",
+        name: "IndexInfo",
         meta:{
           name:'信息列表'
         },
@@ -60,7 +61,7 @@ const routes = [
       },
       {
         path: "/indexCategory",
-        name: "indexCategory",
+        name: "IndexCategory",
         meta:{
           name:'信息分类'
         },
@@ -68,7 +69,7 @@ const routes = [
       },
       {
         path: "/indexDetail",
-        name: "indexDetail",
+        name: "IndexDetail",
         meta:{
           name:'信息详情'
         },
@@ -83,11 +84,11 @@ const routes = [
       name:'用户管理',
       icon:'user'
     },
-    component: () => import( "../views/Layout/index.vue"),
+    component: Layout,
     children: [
       {
         path: "/userIndex",
-        name: "userIndex",
+        name: "UserIndex",
         meta:{
           name:'用户列表'
         },

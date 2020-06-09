@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import svgIcon from './svgIcon';
 Vue.component('svg-icon',svgIcon);
-
 const req = require.context('./svg', false, /\.svg$/);
 const requireAll = requireContext => requireContext.keys().map(requireContext);
 // （创建了）一个包含了 svg 文件夹（不包含子目录）下面的、所有文件名以 `.suv` 结尾的、能被 require 请求到的文件的上下文。
