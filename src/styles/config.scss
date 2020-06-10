@@ -7,6 +7,7 @@ $navBgc:#344a5f;
 $layoutHeader:75px;
 // 主颜色
 $mainCcolor: #f56c6c;
+$hoverColor: #e26666;
 // 动画过渡
 @mixin webkit($type, $value) {
     -webkit-#{$type}: $value ;

@@ -22,7 +22,7 @@ import { reactive, ref, computed } from '@vue/composition-api';
 export default {
     name: 'navMenu',
     setup(props, { root }) {
-        const isCollapse = computed(() => root.$store.state.isCollapse);
+        const isCollapse = computed(() => root.$store.state.app.isCollapse);
         const routerTab = reactive(root.$router.options.routes);
       return{
           isCollapse,
@@ -38,7 +38,7 @@ export default {
         img { 
             margin: 28px auto 25px;
             width: 92px;
-            // @include webkit(transition, all .3s ease 0s);
+            @include webkit(transition, all .3s ease 0s);
         }
     }
     #nav-wrap{
@@ -62,5 +62,6 @@ export default {
         #nav-wrap{
             width:$navMenuMix;
         }
+        .logo img{width: 60%;}
     }
 </style>

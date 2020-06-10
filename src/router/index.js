@@ -2,6 +2,11 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 Vue.use(VueRouter);
+// 避免到了当前位置的冗余导航
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 import Layout from '@/views/Layout'
 const routes = [

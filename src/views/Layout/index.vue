@@ -17,7 +17,7 @@ export default {
         layoutHeader,layoutMain,layoutNav
     },
     setup(props, { root }) {
-      const menuStatus = computed(() => root.$store.state.isCollapse );
+      const menuStatus = computed(() => root.$store.state.app.isCollapse );
       return{
         menuStatus
       }
@@ -25,5 +25,5 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-  
+
 </style>

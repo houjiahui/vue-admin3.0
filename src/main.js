@@ -8,6 +8,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './styles/main.scss';
 // 自定义全局组件
 import './Icon';
+import './router/premit';
 Vue.use(ElementUI);
 Vue.use(VueCompositionApi);
 

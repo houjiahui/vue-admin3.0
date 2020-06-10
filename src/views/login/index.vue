@@ -186,7 +186,10 @@ export default {
                 loginButton.value = false;
                 countDown(60);
             }).catch(error => {
-
+                updateButtonStatus({
+                    status: true,
+                    text: '请先注册用户'
+                })
             })
         })
         // 提交表单
@@ -213,7 +216,7 @@ export default {
                 code: ruleForm.code
             }
             // 登录接口
-            Login(requestData).then(response =>{
+            root.$store.dispatch('app/login',requestData).then(response =>{
                 let data= response.data;
                 root.$message({
                     message: data.message,

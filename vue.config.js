@@ -118,7 +118,7 @@ module.exports = {
             // 配置跨域处理,只有一个代理
             proxy: {
                 "/devapi": {
-                    target: "http://www.web-jshtml.cn/productapi",
+                    target: "http://www.web-jshtml.cn/productapi/token",
                     changeOrigin: true,
                     pathRewrite: {
                         "^/devapi": "/"
